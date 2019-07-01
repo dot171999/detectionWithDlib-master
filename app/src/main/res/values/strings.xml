@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Blink</string>
+    <string name="request_permission">This sample needs camera permission.</string>
+    <string name="camera_error">This device doesn\'t support Camera2 API.</string>
+    <string name="string_chooseMode">choose detection mode：</string>
+    <string name="string_btnSave">save</string>
+</resources>
