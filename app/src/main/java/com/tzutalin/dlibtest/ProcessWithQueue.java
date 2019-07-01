@@ -34,6 +34,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -107,7 +109,7 @@ public class ProcessWithQueue extends Thread {
 
         mSharedPreferences = context.getSharedPreferences("userInfo", MODE_PRIVATE);
         checkMode = mSharedPreferences.getString("detectionMode","");
-
+        startTimer();
         start();
     }
 
@@ -269,8 +271,55 @@ public class ProcessWithQueue extends Thread {
 
                     });
         }
+    }
 
 
+    private Timer timer;
+    private TimerTask timerTask;
+
+    public void startTimer() {
+        //set a new Timer
+        timer = new Timer();
+
+        //initialize the TimerTask's job
+        initializeTimerTask();
+
+        //schedule the timer, to wake up every 1 second
+        timer.schedule(timerTask, 1000, 1000); //
+    }
+
+    public void initializeTimerTask() {
+        timerTask = new TimerTask() {
+            public void run() {
+                Log.i("in timer", "in timer ++++  "+ (blink));
+                try {
+                    File root = new File(Environment.getExternalStorageDirectory(), "Blink");
+                    if (!root.exists()) {
+                        root.mkdirs();
+                    }
+                    File gpxfile = new File(root, "log"+".txt");
+                    FileWriter writer = new FileWriter(gpxfile,true);
+                    writer.append(timeStamp()+" Blink="+blink);
+                    writer.append("\n\r");
+                    writer.flush();
+                    writer.close();
+                    //Toast toast= Toast.makeText(context,
+                    //"Logged", Toast.LENGTH_SHORT);
+                    //toast.setGravity(Gravity.BOTTOM|Gravity.END, 0, 0);
+                    //toast.show();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+    }
+
+    public void stoptimertask() {
+        //stop the timer, if it's not already null
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
     }
 
     public void generateNoteOnSD(Context context, String sFileName, String sBody) {
